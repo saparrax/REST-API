@@ -38,33 +38,43 @@ public class VisibilityServiceImpl implements VisibilityService {
 
     public List<Product> getVisibleProducts() throws CsvValidationException, IOException {
         log.debug("Get visible Products from CSV");
-        List<Product> products = csvReaderService.getProductsFromCsv(productFile);
-        Map<Long, List<Size>> sizes = csvReaderService.getSizesFromCsv(sizeFile);
-        Map<Long, Integer> stocks = csvReaderService.getStockFromCsv(stockFile);
+        try {
+            List<Product> products = csvReaderService.getProductsFromCsv(productFile);
+            Map<Long, List<Size>> sizes = csvReaderService.getSizesFromCsv(sizeFile);
+            Map<Long, Integer> stocks = csvReaderService.getStockFromCsv(stockFile);
 
-        List<Product> visibleProducts = products.stream()
-                .filter(product -> sizes.containsKey(product.getId()))
-                .filter(product -> {
-                    List<Size> sizesByProduct = sizes.get(product.getId());
-                    return sizesByProduct.stream()
-                            .anyMatch(size -> {
-                                Boolean backSoon = size.getBackSoon();
-                                Boolean special = size.getSpecial();
-                                Long sizeId = size.getId();
-                                Integer stock = stocks.getOrDefault(sizeId, 0);
-                                return backSoon && !special || (!backSoon && !special && stock > 0);
-                            });
-                })
-                .collect(Collectors.toList());
+            List<Product> visibleProducts = products.stream()
+                    .filter(product -> sizes.containsKey(product.getId()))
+                    .filter(product -> {
+                        List<Size> sizesByProduct = sizes.get(product.getId());
+                        return sizesByProduct.stream()
+                                .anyMatch(size -> {
+                                    Boolean backSoon = size.getBackSoon();
+                                    Boolean special = size.getSpecial();
+                                    Long sizeId = size.getId();
+                                    Integer stock = stocks.getOrDefault(sizeId, 0);
+                                    return backSoon && !special || (!backSoon && !special && stock > 0);
+                                });
+                    })
+                    .collect(Collectors.toList());
 
-        return visibleProducts;
+            return visibleProducts;
+        } catch (IOException | CsvValidationException ex) {
+            log.error("Error occurred while retrieving visible products: {}", ex.getMessage());
+            throw ex;
+        }
     }
 
     @Override
     public List<Long> getVisibleProductsOrdered() throws CsvValidationException, IOException {
         log.debug("Get visible Products from CSV ordered");
-        List<Product> visibleProducts = getVisibleProducts();
-        return sortProductsBySequence(visibleProducts);
+        try {
+            List<Product> visibleProducts = getVisibleProducts();
+            return sortProductsBySequence(visibleProducts);
+        } catch (IOException | CsvValidationException ex) {
+            log.error("Error occurred while retrieving and ordering visible products: {}", ex.getMessage());
+            throw ex;
+        }
     }
 
     public List<Long> sortProductsBySequence(List<Product>products){

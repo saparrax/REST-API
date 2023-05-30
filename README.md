@@ -1,63 +1,87 @@
-#Algoritmo de Visibilidad
+# Visibility algorithm
 
-Aplicación de Spring Boot que implementa un algoritmo para filtrar los productos
-visibles basandose de datos proporcionados en archivos CSV.
+Spring Boot application that implements an algorithm to filter the products visible based on data provided in CSV files.
 
-La aplicación tiene los siguientes package:
-    -controller: contiene controladores y el handler de las excepciones.
-    -service: contiene las interfaces de los servicios, las implementaciones y los DTO que usan estos.
-    -swagger: configuración del swagger.
+## Project Structure
 
-Dentro de resources tenemos:
-    -data/csv: archivos CSV que se procesarán.
-    -data/csv/test: archivos CSV para los test unitarios.
+The application is organized into the following packages:
+- controller: Contains the controllers and exception handlers.
+- service: Contains the service interfaces, implementations, and DTOs.
+- swagger: Configuration for Swagger.
 
-#Configuración proyecto
--Java 11
--Maven
--Spring Boot 2.7.12
--Packaging Jar
+Inside the 'resources' directory:
+- data/csv: CSV files to be processed.
+- data/csv/test: CSV files for unit testing.
 
-#Ejecución servicio
+## Project Prerequisites
 
-1-Verifica que tienes los archivos CSV necesarios ('product.csv', 'size.csv' y 'stock.csv') en la ruta '/data/csv'
-dentro de resources.
-2-Arrancar la aplicación.
-3-Lanzar un request GET a la siguiente URL 'http://localhost:8080/api/products'.
+- Java Development Kit (JDK) 11 or later
+- Maven
 
-#Test unitarios
-La aplicación tiene test unitarios de todos los servicios y el controller:
-También hay un test de integración para probar la request.
-Test:
-    -CsvReaderServiceImplTest
-    -VisibilityServiceImplTest
-    -VisibilityControllerIT
+## Installation
 
-#Docker
-La aplicación esta dockerizada y el archivo 'Dockerfile' se encuentra en la raiz el proyecto.
-Comandos para desplegar en docker, debemos estar en la raíz del proyecto y ejecutar los
-siguentes comandos en un terminal:    
-    docker build -t spring-boot-docker .
-    docker run -p 8080:8080 spring-boot-docker
+To install and set up the application, follow these steps:
 
-#Swagger
-Configuración básica de Swagger para gestionar las request.
-Para acceder a swagger debemos arrancar la aplicación y acceder a la siguiente URL 'http://localhost:8080/swagger-ui/#/'
+1. Clone the repository to your local machine.
+2. Navigate to the project root directory.
+3. Run the following command to build the application:
 
-#Logger
-Logger en los servicios y controllers para registrar información de la aplicación.
-Log configurado a DEBUG en el properties de la aplicación(application.properties).
+```
+mvn clean install
+```
 
-#Estructuras de datos utilizadas en el algoritmo
-1- List: con esta estructura puedo almacenar y iterar los productos.
-2- Map: con esta estructura puedo buscar y acceder de forma rápida a las tallas asociadas al Producto.
-o el stock asociado a las tallas. En vez de recorrer una List puedo filtrar directamente con la clave
-para obtener los elementos asociados. Con el uso del Map evito recorrer elementos que no me interesan.
+## Prepare CSV files
 
-#Complejidad temporal del algoritmo
-La complejidad temporal es O(n*m), donde 'n' representa los productos y 'm' el número de tallas.
-El peor caso sería recorrer todas las tallas por cada producto.
-En el segundo bucle gracias al Map itero únicamente las tallas asociadas al producto, de esta manera reduzco la
-lista de tallas a iterar.
-Para evitar un tercer bucle he implementado un Map con el stock asociado a las tallas. De esta manera puedo consultar
-directamente el stock a partir de la key y evito recorrer toda la lista.
+Ensure that the required CSV files ('product.csv', 'size.csv', and 'stock.csv') are located in the path '/data/csv' inside '/resources'.
+
+## Running the Application
+To run the application, use the following command:
+
+```
+mvn spring-boot:run
+```
+
+- This command will start the Spring Boot application and make it accessible at http://localhost:8080.
+- Send a GET request to http://localhost:8080/api/products to get the visible Products.
+
+## Tests
+
+The application includes unit tests for all services and the controller. Additionally, there is an integration test to validate the request.
+
+- CsvReaderServiceImplTest: CsvReaderServiceImplTest: Validates the CSV reading in 'CsvReaderServiceImpl' with the test files in the '/test' folder.
+- VisibilityServiceImplTest: Tests the methods in the 'VisibilityServiceImpl' service by mocking the CSV reading and verifying the functionality of the product filtering algorithm.
+- VisibilityControllerIT: Tests the request in the 'VisibilityController' to ensure its correctness.
+
+You can run the tests using the following command:
+``` 
+mvn test
+``` 
+
+## Docker
+
+The application is containerized, and the 'Dockerfile' is located in the project's root directory. To deploy the application using Docker, execute the following commands in a terminal from the project's root directory: 
+```    
+docker build -t spring-boot-docker .
+docker run -p 8080:8080 spring-boot-docker
+```
+
+## Swagger
+
+The application provides API documentation using Swagger. Once the application is running, you can access the Swagger UI at http://localhost:8080/swagger-ui/#/.
+The API documentation provides detailed information about the available endpoints, request/response formats, and example requests.
+
+## Logger
+
+The application utilizes logging to record important events and provide debugging information.
+The default log level is DEBUG.
+
+## Data Structures Used in the Algorithm
+
+- `List` Used to store and iterate over products.
+- `Map` Utilized for quick access and lookup of sizes associated with a product or the stock associated with sizes. 
+Using a map allows efficient retrieval of desired elements without the need for iterating over the entire list.
+
+## Algorithm Time Complexity
+
+The algorithm has a time complexity of O(n*m), where 'n' represents the number of products and 'm' represents the number of sizes.
+In the worst-case scenario, all sizes need to be iterated for each product. However, utilizing maps allows for more efficient filtering and retrieval, reducing the need for additional iterations.
